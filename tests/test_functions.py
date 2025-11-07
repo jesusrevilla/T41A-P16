@@ -25,9 +25,16 @@ def fetch_all(conn, query, params=()):
         cur.execute(query, params)
         return cur.fetchall()
 
+def execute_query(connection, query, params=None):
+    """Ejecuta un comando que no devuelve filas (CALL, INSERT, UPDATE)."""
+    with connection.cursor() as cursor:
+        cursor.execute(query, params or ())
+    # ¡Commit es crucial para que los cambios sean visibles en otros tests!
+    connection.commit()
+
 def test_call_register_movements(db_connection):
-    fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (1,'salida',20))
-    fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (2,'entrada',50))
+    execute_query(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (1,'salida',20))
+    execute_query(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (2,'entrada',50))
     assert True
 
 def test_calcular_valor_inventario(db_connection):
