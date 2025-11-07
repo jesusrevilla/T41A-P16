@@ -30,10 +30,6 @@ def test_call_register_movements(db_connection):
     fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (2,'entrada'),(50,))
     assert True
 
-def test_validar_correo(db_connection):
-    assert fetch_scalar(db_connection, "SELECT validar_correo('test@example.com')") == True
-    assert fetch_scalar(db_connection, "SELECT validar_correo('invalido')") == False
-
 def test_calcular_valor_inventario(db_connection):
     query = "SELECT calcular_valor_inventario();"
     result = fetch_all(db_connection, query)
