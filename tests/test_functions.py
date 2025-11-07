@@ -26,8 +26,8 @@ def fetch_all(conn, query, params=()):
         return cur.fetchall()
 
 def test_call_register_movements(db_connection):
-    fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (1,'salida'),(20,))
-    fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (2,'entrada'),(50,))
+    fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (1,'salida',20))
+    fetch_scalar(db_connection, "CALL registrar_movimiento(%s,%s,%s)", (2,'entrada',50))
     assert True
 
 def test_calcular_valor_inventario(db_connection):
