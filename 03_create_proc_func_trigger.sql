@@ -6,12 +6,23 @@ CREATE OR REPLACE PROCEDURE registrar_movimiento(
 )
 LANGUAGE plpgsql
 AS $$
+DECLARE
+    stock_actual INT;
 BEGIN
-    -- Insertar el movimiento
+    SELECT stock INTO stock_actual FROM productos WHERE id = p_producto_id;
+    
+    IF p_tipo_movimiento = 'salida' AND p_cantidad > stock_actual THEN
+        RAISE EXCEPTION 'No hay suficiente stock. Stock disponible: %, cantidad solicitada: %', 
+                        stock_actual, p_cantidad;
+    END IF;
+    
+    IF p_cantidad <= 0 THEN
+        RAISE EXCEPTION 'La cantidad debe ser mayor a 0';
+    END IF;
+    
     INSERT INTO movimientos_inventario (producto_id, tipo_movimiento, cantidad)
     VALUES (p_producto_id, p_tipo_movimiento, p_cantidad);
     
-    -- Actualizar el stock del producto
     IF p_tipo_movimiento = 'entrada' THEN
         UPDATE productos 
         SET stock = stock + p_cantidad 
@@ -44,7 +55,6 @@ $$;
 CREATE OR REPLACE FUNCTION registrar_auditoria_stock()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Registrar solo si el stock cambió
     IF OLD.stock IS DISTINCT FROM NEW.stock THEN
         INSERT INTO auditoria_stock (producto_id, stock_anterior, stock_nuevo)
         VALUES (OLD.id, OLD.stock, NEW.stock);
