@@ -154,18 +154,25 @@ def test_movimiento_stock_negativo():
     cur.execute("SELECT stock FROM productos WHERE id = 4")
     stock_actual = cur.fetchone()[0]
     
-    # Intentar sacar más de lo disponible
+    # Intentar sacar más de lo disponible - debería fallar
     try:
         cur.execute("CALL registrar_movimiento(4, 'salida', %s)", (stock_actual + 100,))
         conn.commit()
         # Si llega aquí, el test falla porque debería haber generado error
         assert False, "Se permitió stock negativo"
     except Exception as e:
+        # Verificar que se lanzó una excepción
+        conn.rollback()  # Importante: hacer rollback de la transacción fallida
+        
         # Verificar que el stock no cambió
         cur.execute("SELECT stock FROM productos WHERE id = 4")
         stock_despues = cur.fetchone()[0]
-        assert stock_despues == stock_actual
-        print(f"Error esperado: {e}")
+        assert stock_despues == stock_actual, f"Stock cambió indebidamente: {stock_despues} vs {stock_actual}"
+        
+        # Verificar que el mensaje de error es el esperado
+        error_msg = str(e)
+        print(f"Error esperado capturado: {error_msg}")
+        assert "No hay suficiente stock" in error_msg or "stock" in error_msg.lower()
     
     cur.close()
     conn.close()
