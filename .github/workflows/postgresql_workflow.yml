@@ -57,7 +57,3 @@ jobs:
     - name: Run tests
       run: |
         pytest
-
-    - name: Reset database for verification
-      run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 04_reset_test.sql
