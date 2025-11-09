@@ -15,7 +15,7 @@ BEGIN
   END IF;
 
   -- Validar stock suficiente en caso de salida
-  IF tipo = 'SALIDA' AND cantidad_mov > cantidad_base THEN
+  IF tipo = 'salida' AND cantidad_mov > cantidad_base THEN
     RAISE EXCEPTION 'STOCK INSUFICIENTE: disponible %, solicitado %', cantidad_base, cantidad_mov;
   END IF;
 
@@ -24,9 +24,9 @@ BEGIN
   VALUES (id_prod, tipo, cantidad_mov);
 
   -- Actualizar stock
-  IF tipo = 'SALIDA' THEN
+  IF tipo = 'salida' THEN
     UPDATE productos SET stock = stock - cantidad_mov WHERE id = id_prod;
-  ELSIF tipo = 'ENTRADA' THEN
+  ELSIF tipo = 'entrada' THEN
     UPDATE productos SET stock = stock + cantidad_mov WHERE id = id_prod;
   ELSE
     RAISE EXCEPTION 'Tipo de movimiento inválido: %', tipo;
@@ -34,7 +34,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION calcular_inventario()
+CREATE OR REPLACE FUNCTION calcular_valor_inventario()
 RETURNS NUMERIC AS $$
 BEGIN
     --Suma del inventario total
