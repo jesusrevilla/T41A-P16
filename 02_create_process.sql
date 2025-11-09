@@ -2,35 +2,59 @@ CREATE OR REPLACE PROCEDURE registrar_movimiento(
   IN id_prod INT,
   IN tipo TEXT,
   IN cantidad_mov INT
-  )
+)
 LANGUAGE plpgsql
 AS $$
-DECLARE 
+DECLARE
   cantidad_base INT;
 BEGIN
-  SELECT stock INTO cantidad_base FROM productos WHERE id=id_prod
-  IF tipo='SALIDA' and cantidad_mov>cantidad_base THEN
-    RAISE NOTICE 'STOCK INSUFICIENTE'
-    RETURN
+  -- Validar existencia del producto
+  SELECT stock INTO cantidad_base FROM productos WHERE id = id_prod;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Producto con ID % no existe.', id_prod;
+  END IF;
+
+  -- Validar stock suficiente en caso de salida
+  IF tipo = 'SALIDA' AND cantidad_mov > cantidad_base THEN
+    RAISE EXCEPTION 'STOCK INSUFICIENTE: disponible %, solicitado %', cantidad_base, cantidad_mov;
+  END IF;
+
+  -- Registrar movimiento
+  INSERT INTO movimientos_inventario(producto_id, tipo_movimiento, cantidad)
+  VALUES (id_prod, tipo, cantidad_mov);
+
+  -- Actualizar stock
+  IF tipo = 'SALIDA' THEN
+    UPDATE productos SET stock = stock - cantidad_mov WHERE id = id_prod;
+  ELSIF tipo = 'ENTRADA' THEN
+    UPDATE productos SET stock = stock + cantidad_mov WHERE id = id_prod;
   ELSE
-    INSERT INTO movimientos_inventario(producto_id,tipo_movimiento,cantidad) VALUES (id_prod,tipo,cantidad_mov);
-    IF tipo='SALIDA' THEN
-      UPDATE productos SET stock=cantidad_base-cantidad_mov WHERE productos.id=id_prod
-    ELSIF tipo='ENTRADA' THEN
-      UPDATE productos SET stock=cantidad_base+cantidad_mov WHERE id=id_prod
-    END IF;
-  END IF;    
+    RAISE EXCEPTION 'Tipo de movimiento inválido: %', tipo;
+  END IF;
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION calcular_desc(monto NUMERIC, descuento NUMERIC)
+CREATE OR REPLACE FUNCTION calcular_inventario()
 RETURNS NUMERIC AS $$
 BEGIN
-    IF descuento<=0 or descuento>=1 THEN
-      RAISE NOTICE 'FORMATO DE DESCUENTO INCORRECTO( DEBE SER FORMATO DECIMAL 50%%=>0.5)';
-      RETURN Null;
-    ELSE 
-      RETURN monto*(1-descuento);
-    END IF;
+    --Suma del inventario total
+    RETURN (SELECT SUM(stock * precio_unitario) FROM productos);
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION registrar_auditoria_stock()
+RETURNS TRIGGER AS $$
+BEGIN
+    --Insertar en tabla de auditoria
+    INSERT INTO auditoria_stock (producto_id, stock_anterior, stock_nuevo)
+    VALUES (OLD.id, OLD.stock, NEW.stock);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+--Creación del Trigger
+CREATE TRIGGER trigger_auditoria_stock
+AFTER UPDATE OF stock ON productos
+FOR EACH ROW
+WHEN (OLD.stock IS DISTINCT FROM NEW.stock)
+EXECUTE FUNCTION registrar_auditoria_stock();
