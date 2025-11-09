@@ -46,14 +46,10 @@ jobs:
       run: |
         PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 01_create_tables.sql
 
-    - name: Insert data
+    - name: Create procedures, functions and triggers 
       run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 02_insert_data.sql      
+        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 02_create_process.sql      
 
-    - name: Create procedures, functions and triggers
-      run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 03_create_proc_func_trigger.sql          
-        
     - name: Run tests
       run: |
         pytest
