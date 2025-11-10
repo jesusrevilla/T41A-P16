@@ -42,18 +42,26 @@ jobs:
       run: |
         sleep 10
 
-    - name: Set up database schema and data
+    - name: Run 01_create_tables.sql
+      env:
+        PGPASSWORD: postgres
       run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 01_create_tables.sql
+        PGOPTIONS="-v ON_ERROR_STOP=1" psql -h localhost -U postgres -d test_db -f 01_create_tables.sql
 
-    - name: Insert data
+    - name: Run 02_insert_data.sql
+      env:
+        PGPASSWORD: postgres
       run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 02_insert_data.sql      
+        PGOPTIONS="-v ON_ERROR_STOP=1" psql -h localhost -U postgres -d test_db -f 02_insert_data.sql
 
-    - name: Create procedures, functions and triggers
+    - name: Run 03_procedure_function_trigger.sql
+      env:
+        PGPASSWORD: postgres
       run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 03_create_proc_func_trigger.sql          
+        PGOPTIONS="-v ON_ERROR_STOP=1" psql -h localhost -U postgres -d test_db -f 03_procedure_function_trigger.sql
         
-    - name: Run tests
+    - name: Run Pytest
+      env:
+        PGPASSWORD: postgres 
       run: |
         pytest
