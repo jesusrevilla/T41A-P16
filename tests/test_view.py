@@ -35,7 +35,7 @@ def test_inventory_logic_flow():
 
         cur.execute("SELECT COUNT(*) FROM auditoria_stock;")
         conteo_auditoria = cur.fetchone()[0]
-        assert conteo_auditoria == 2, "La tabla 'auditoria_stock' no registró los 2 cambios (¡FALTA EL TRIGGER!)."
+        assert conteo_auditoria == 2, "La tabla 'auditoria_stock' no registró los 2 cambios."
       
         cur.execute("SELECT stock_anterior, stock_nuevo FROM auditoria_stock WHERE producto_id = 1;")
         auditoria_tornillo = cur.fetchone()
