@@ -37,12 +37,6 @@ BEGIN
     
 END;
 $$;
-
--- Registrar movimientos
-CALL registrar_movimiento(1, 'salida', 20);
-CALL registrar_movimiento(2, 'entrada', 50);
-
-SELECT * FROM productos;
 ------------------------------------------------
 -- Calcular valor del inventario
 CREATE OR REPLACE FUNCTION calcular_valor_inventario()
@@ -57,8 +51,7 @@ BEGIN
     RETURN valor_total;
 END;
 $$ LANGUAGE plpgsql;
-SELECT calcular_valor_inventario();
----------------------------------------------
+-------------------------------------------------
 -- Ver auditoría
 CREATE OR REPLACE FUNCTION registrar_auditoria_stock()
 RETURNS TRIGGER AS $$
@@ -76,3 +69,13 @@ AFTER UPDATE ON productos
 FOR EACH ROW
 WHEN (OLD.stock IS DISTINCT FROM NEW.stock)
 EXECUTE FUNCTION registrar_auditoria_stock();
+---------------------------------------------------------
+-- Registrar movimientos
+CALL registrar_movimiento(1, 'salida', 20);
+CALL registrar_movimiento(2, 'entrada', 50);
+SELECT * FROM productos;
+SELECT calcular_valor_inventario();
+SELECT * FROM auditoria_stock;
+
+
+
