@@ -27,9 +27,9 @@ def run_query_from_file(conn, filename):
 def test_function_procedure(db_connection):
     with db_connection.cursor() as cur:
         cur.execute("CALL registrar_movimiento(1, 'salida', 20);")
-        result = cur.fetchone()[0]
+        result = cur.execute("SELECT stock FROM productos WHERE id=1;")
         cur.execute("CALL registrar_movimiento(2, 'entrada', 50);")
-        result2 = cur.fetchone()[0]
+        result2 = cur.execute("SELECT stock FROM productos WHERE id=2;")
     assert result == 80
     assert result2 == 250
 
