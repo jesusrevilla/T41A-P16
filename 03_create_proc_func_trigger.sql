@@ -3,7 +3,7 @@
 CREATE PROCEDURE registrar_movimiento(producto_id INTEGER, tipo_movimiento TEXT, cantidad INTEGER)
 LANGUAGE plpgsql
 AS $$
-  DECLARE valor_stock INTEGER
+  DECLARE valor_stock INTEGER;
 BEGIN
     INSERT INTO movimientos_inventario (producto_id, tipo_movimiento, cantidad) VALUES (producto_id, tipo_movimiento, cantidad);
     SELECT stock INTO valor_stock FROM productos WHERE productos.id = producto_id;
