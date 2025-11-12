@@ -25,3 +25,14 @@ BEGIN
     VALUES (p_producto_id, p_tipo_movimiento, p_cantidad);
 END;
 $$;
+
+--Función
+CREATE OR REPLACE FUNCTION calcular_valor_inventario()
+RETURNS NUMERIC(10,2) AS $$
+DECLARE
+    v_total NUMERIC(10,2);
+BEGIN
+    SELECT SUM(stock * precio_unitario) INTO v_total FROM productos;
+    RETURN v_total;
+END;
+$$ LANGUAGE plpgsql;
