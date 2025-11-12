@@ -52,7 +52,7 @@ jobs:
 
     - name: Create procedures, functions and triggers
       run: |
-        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 03_create_proc_func_trigger.sql          
+        PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f 03_exercise.sql          
         
     - name: Run tests
       run: |
