@@ -1,6 +1,6 @@
 --procedimiento
 --Registra un movimiento de inventario y actualiza el stock del producto.
-CREATE PROCEDURE registrar_movimiento(producto_id, tipo_movimiento, cantidad)
+CREATE PROCEDURE registrar_movimiento(producto_id INTEGER, tipo_movimiento TEXT, cantidad INTEGER)
 LANGUAGE plpgsql
 AS $$
   DECLARE valor_stock INTEGER
