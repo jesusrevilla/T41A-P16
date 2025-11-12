@@ -10,7 +10,7 @@ BEGIN
     IF tipo_movimiento='entrada' THEN
       valor_stock = valor_stock + cantidad;
     ELSIF tipo_movimiento='salida' THEN
-      valor_stock = valor_stock + cantidad;
+      valor_stock = valor_stock - cantidad;
     END IF;
     UPDATE productos SET stock = valor_stock WHERE productos.id = producto_id;
 END;
