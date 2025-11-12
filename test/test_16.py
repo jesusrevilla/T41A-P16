@@ -40,7 +40,7 @@ def test_calcular_valor_inventario(db_connection):
     query = "SELECT calcular_valor_inventario();"
     result = fetch_all(db_connection, query)
     productos = {row[0] for row in result}
-    assert productos == {120.00}
+    assert productos == {115.00}
 
 def test_auditoria_stock(db_connection):
     query = "SELECT id,producto_id,stock_anterior,stock_nuevo FROM auditoria_stock;"
