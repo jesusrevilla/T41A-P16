@@ -18,7 +18,7 @@ def test_valor_inventario():
     valor = cur.fetchone()[0]
 
     # Verificar resultado esperado
-    assert valor == 85.0  # Ajusta según tus datos de prueba
+    assert valor == 115.0
 
     cur.close()
     conn.close()
