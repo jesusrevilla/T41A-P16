@@ -1,11 +1,8 @@
 
-    name: Daily Pull Request Info
+name: Daily Pull Request Info
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch
 
 jobs:
   get-pr-info:
