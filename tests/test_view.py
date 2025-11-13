@@ -32,11 +32,23 @@ def test_inventario(db_connection):
     ejecutar_query(conn, "DELETE FROM movimientos_inventario;")
     ejecutar_query(conn, "DELETE FROM productos;")
 
-    ejecutar_query(conn, "INSERT INTO productos (nombre, stock, precio_unitario) VALUES ('Tornillo', 100, 0.50);")
-    ejecutar_query(conn, "INSERT INTO productos (nombre, stock, precio_unitario) VALUES ('Tuerca', 200, 0.30);")
+ejecutar_query(conn, "DELETE FROM auditoria_stock;")
+ejecutar_query(conn, "DELETE FROM movimientos_inventario;")
+ejecutar_query(conn, "DELETE FROM productos;")
 
-    ejecutar_query(conn, "CALL registrar_movimiento(1, 'salida', 20);")
-    ejecutar_query(conn, "CALL registrar_movimiento(2, 'entrada', 50);")
+tornillo_id = ejecutar_query(conn, 
+    "INSERT INTO productos (nombre, stock, precio_unitario) VALUES ('Tornillo', 100, 0.50) RETURNING id;", 
+    fetch=True
+)[0]['id']
+
+tuerca_id = ejecutar_query(conn, 
+    "INSERT INTO productos (nombre, stock, precio_unitario) VALUES ('Tuerca', 200, 0.30) RETURNING id;", 
+    fetch=True
+)[0]['id']
+
+ejecutar_query(conn, f"CALL registrar_movimiento({tornillo_id}, 'salida', 20);")
+ejecutar_query(conn, f"CALL registrar_movimiento({tuerca_id}, 'entrada', 50);")
+
 
     valor = ejecutar_query(conn, "SELECT calcular_valor_inventario() AS total;", fetch=True)[0]['total']
     print(f"Valor total del inventario: {valor}")
