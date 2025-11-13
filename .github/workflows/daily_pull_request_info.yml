@@ -2,7 +2,10 @@
     name: Daily Pull Request Info
 
 on:
-  workflows_dispatch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   get-pr-info:
