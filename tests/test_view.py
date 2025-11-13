@@ -1,3 +1,22 @@
+import psycopg2
+import pytest
+from pathlib import Path
+from decimal import Decimal
+
+DB_CONFIG = {
+    "dbname": "test_db",
+    "user": "postgres",
+    "password": "postgres",
+    "host": "localhost",
+    "port": 5432
+}
+
+@pytest.fixture(scope="module")
+def db_connection():
+    conn = psycopg2.connect(**DB_CONFIG)
+    yield conn
+    conn.close()
+
 def ejecutar_query(query, params=None, fetch=False):
     """Ejecuta una consulta SQL con control de commit y retorno opcional."""
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -7,8 +26,6 @@ def ejecutar_query(query, params=None, fetch=False):
         conn.commit()
 
 def test_inventario():
-    print("🔧 Ejecutando pruebas del control de inventario...\n")
-
     ejecutar_query("DELETE FROM auditoria_stock;")
     ejecutar_query("DELETE FROM movimientos_inventario;")
     ejecutar_query("DELETE FROM productos;")
@@ -23,7 +40,7 @@ def test_inventario():
     print(f"Valor total del inventario: {valor}")
 
     auditoria = ejecutar_query("SELECT * FROM auditoria_stock ORDER BY id;", fetch=True)
-    print(f"📋 Registros de auditoría: {len(auditoria)} encontrados\n")
+    print(f"Registros de auditoría: {len(auditoria)} encontrados\n")
     for registro in auditoria:
         print(f" - Producto {registro['producto_id']}: {registro['stock_anterior']} → {registro['stock_nuevo']}")
 
