@@ -2,7 +2,7 @@
     name: Daily Pull Request Info
 
 on:
-  workflow_dispatch
+  workflows_dispatch
 
 jobs:
   get-pr-info:
