@@ -75,7 +75,6 @@ def test_registrar_movimiento_salida(db_connection):
 
 def test_trigger_auditoria(db_connection):
     """ Verifica que el trigger registre cambios de stock """
-    # Cambiar stock manualmente para activar trigger
     execute(db_connection, "UPDATE productos SET stock = stock + 10 WHERE id = 1")
 
     rows = fetch_all(db_connection,
@@ -84,7 +83,6 @@ def test_trigger_auditoria(db_connection):
 
     assert len(rows) >= 1
 
-    # Se toma el último registro insertado por el trigger
     last = rows[-1]
     producto_id, stock_anterior, stock_nuevo = last
 
@@ -94,8 +92,17 @@ def test_trigger_auditoria(db_connection):
 
 def test_calcular_valor_inventario(db_connection):
     """ Verifica que la función calcule bien el valor total """
+
+    # Obtener stocks reales tras los movimientos realizados
+    stock_tornillo = fetch_scalar(db_connection, "SELECT stock FROM productos WHERE nombre = 'Tornillo'")
+    stock_tuerca = fetch_scalar(db_connection, "SELECT stock FROM productos WHERE nombre = 'Tuerca'")
+
+    # Precios fijos según inserción
+    precio_tornillo = 0.50
+    precio_tuerca = 0.30
+
+    expected_total = stock_tornillo * precio_tornillo + stock_tuerca * precio_tuerca
+
     total = fetch_scalar(db_connection, "SELECT calcular_valor_inventario()")
 
-    # Tornillo: stock ~120, precio 0.50  → 60
-    # Tuerca:  stock 200, precio 0.30 → 60
-    assert total == pytest.approx(120.00)
+    assert total == pytest.approx(expected_total)
